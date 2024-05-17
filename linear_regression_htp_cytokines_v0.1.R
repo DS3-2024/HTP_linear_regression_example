@@ -45,6 +45,8 @@
 
 
 # 0 General Setup -----
+# RUN FIRST TIME
+# renv::init()
 ## 0.1 Load required libraries ----
 library("readxl") # used to read .xlsx files
 library("openxlsx") # used for data export as Excel workbooks
@@ -56,8 +58,8 @@ library("ggforce") # required for zooming and sina
 library("tictoc") # timer
 library("skimr") # data summary
 library("broom") # tidying model objects
-library("janitor")
-library("patchwork")
+library("janitor") # data cleaning
+library("patchwork") # assembliong multiple plots
 # library("tidyHeatmap")
 # renv::install("synapser", repos = c("http://ran.synapse.org", "http://cran.fhcrc.org"))
 # library("synapser") # accessing data on Synapse
