@@ -52,17 +52,14 @@ library("readxl") # used to read .xlsx files
 library("openxlsx") # used for data export as Excel workbooks
 library("tidyverse") # data wrangling and ggplot2
 library("rstatix") # pipe- and tidy-friendly statistical tests
-library("ggrepel") # required for labelling genes
-library("ggforce") # required for zooming and sina
-# library("plotly") # required for interactive plots/IFNA1
+library("ggrepel") # for labelling genes
+library("ggforce") # for sina plots
 library("tictoc") # timer
 library("skimr") # data summary
 library("broom") # tidying model objects
 library("janitor") # data cleaning
-library("patchwork") # assembliong multiple plots
+library("patchwork") # assembling multiple plots
 # library("tidyHeatmap")
-# renv::install("synapser", repos = c("http://ran.synapse.org", "http://cran.fhcrc.org"))
-# library("synapser") # accessing data on Synapse
 library("conflicted")
 conflict_prefer("filter", "dplyr")
 conflict_prefer("select", "dplyr")
@@ -313,14 +310,15 @@ lm_results_simple <- regressions_simple |>
     FoldChange = 2^estimate, # check for transformation and adjust accordingly
     log2FoldChange = estimate, # check for transformation and adjust accordingly
     pval = p.value,
-    BHadj_pval = p.adjust(pval, method = "BH")
+    BHadj_pval = p.adjust(pval, method = "BH"),
+    Model = "betareg(proportion ~ Karyotype)" # Update accordingly
     ) |> 
   arrange(pval)
 # Volcano plot
 v1 <- lm_results_simple %>% 
   volcano_plot_lab_lm(
     title = "Cytokines: T21 vs. Control",
-    subtitle = paste0("lm: Karyotype~log2(Conc.)\n","[Down: ", (.) %>% filter(BHadj_pval < 0.1 & FoldChange < 1) %>% nrow(), "; Up: ", (.) %>% filter(BHadj_pval < 0.1 & FoldChange > 1) %>% nrow(), "]")
+    subtitle = paste0("lm: log2(Conc.) ~ Karyotype\n","[Down: ", (.) %>% filter(BHadj_pval < 0.1 & FoldChange < 1) %>% nrow(), "; Up: ", (.) %>% filter(BHadj_pval < 0.1 & FoldChange > 1) %>% nrow(), "]")
   )
 v1
 ggsave(filename = here("plots", paste0(out_file_prefix, "volcano_simple", ".png")), width = 5, height = 5, units = "in")
@@ -347,14 +345,15 @@ lm_results_multi_SexAgeSource <- regressions_multi_SexAgeSource |>
     FoldChange = 2^estimate, # check for transformation and adjust accordingly
     log2FoldChange = estimate, # check for transformation and adjust accordingly
     pval = p.value,
-    BHadj_pval = p.adjust(pval, method = "BH")
+    BHadj_pval = p.adjust(pval, method = "BH"),
+    Model = "betareg(proportion ~ Karyotype+Sex+Age+Source)" # Update accordingly
   ) |> 
   arrange(pval)
 # Volcano plot
 v2 <- lm_results_multi_SexAgeSource %>% 
   volcano_plot_lab_lm(
     title = "Cytokines: T21 vs. Control",
-    subtitle = paste0("lm: Karyotype~log2(Conc.)+Sex+Age+Source\n","[Down: ", (.) %>% filter(BHadj_pval < 0.1 & FoldChange < 1) %>% nrow(), "; Up: ", (.) %>% filter(BHadj_pval < 0.1 & FoldChange > 1) %>% nrow(), "]")
+    subtitle = paste0("lm: log2(Conc.) ~ Karyotype+Sex+Age+Source\n","[Down: ", (.) %>% filter(BHadj_pval < 0.1 & FoldChange < 1) %>% nrow(), "; Up: ", (.) %>% filter(BHadj_pval < 0.1 & FoldChange > 1) %>% nrow(), "]")
   )
 v2
 ggsave(filename = here("plots", paste0(out_file_prefix, "volcano_multi", ".png")), width = 5, height = 5, units = "in")
